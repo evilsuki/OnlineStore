@@ -63,6 +63,20 @@ public class OnlineStoreApp
         {
             System.out.println(e.getMessage());
         }
+        finally
+        {
+            if (reader != null)
+            {
+                try
+                {
+                    reader.close();
+                }
+                catch (Exception e)
+                {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
 
         Collections.sort(inventory);
         return inventory;
@@ -95,6 +109,20 @@ public class OnlineStoreApp
         {
             System.out.println(e.getMessage());
         }
+        finally
+        {
+            if (reader != null)
+            {
+                try
+                {
+                    reader.close();
+                }
+                catch (Exception e)
+                {
+                    System.out.println(e.getMessage());
+                }
+            }
+        }
 
         return product;
     }
@@ -107,9 +135,9 @@ public class OnlineStoreApp
         System.out.println("The Store Home Screen");
         System.out.println("--------------------------------------------------------------------------------------------");
         System.out.println("What you like to do?");
-        System.out.println("\t 1. Shop for products.");
-        System.out.println("\t 2. Check your cart.");
-        System.out.println("\t 3. Exit the store.");
+        System.out.println("\t 1. Shop for products");
+        System.out.println("\t 2. Check your cart");
+        System.out.println("\t 3. Exit the store");
         System.out.print("Enter your selection: ");
 
         return scanner.nextInt();
@@ -130,26 +158,31 @@ public class OnlineStoreApp
         }
 
        System.out.println();
-       System.out.print("Enter id number to add item to cart or Enter X to go back home screen: ");
-       String selection = scanner.nextLine().strip();
+       System.out.print("Enter product's ID to add item to Shopping Cart or Enter 0 to go back Home Screen: ");
+       int id = scanner.nextInt();
+       scanner.nextLine();
 
-       if (selection.equalsIgnoreCase("x"))
+       if (id == 0)
        {
-           return;
+           displayHomeScreen();
        }
-
-       int id = Integer.parseInt(selection);
-
-       if (productMap.containsKey(id))
+       else
        {
-           if (cartItems.containsKey(id))
+           if (productMap.containsKey(id))
            {
-               int quantity = cartItems.get(id) + 1;
-               cartItems.put(id, quantity);
+               if (cartItems.containsKey(id))
+               {
+                   int quantity = cartItems.get(id) + 1;
+                   cartItems.put(id, quantity);
+               }
+               else
+               {
+                   cartItems.put(id, 1);
+               }
            }
            else
            {
-               cartItems.put(id, 1);
+               System.out.println("Invalid selection.");
            }
        }
     }
@@ -169,9 +202,50 @@ public class OnlineStoreApp
             int quantity = cartItems.get(productId);
 
             displayProduct(product);
-            System.out.print("\t\t\t Quantity: " + quantity);
+            System.out.println("\t\t\t Quantity: " + quantity);
         }
 
+        System.out.print("Enter 0 for Check Out products or Enter product's ID to remove product: ");
+        int id = scanner.nextInt();
+        scanner.nextLine();
+
+        if (id == 0)
+        {
+            displayCheckOut();
+        }
+        else if (cartItems.containsKey(id))
+        {
+            cartItems.remove(id);
+        }
+        else
+        {
+            System.out.println("Invalid selection.");
+        }
+    }
+
+
+    // calculator for check out
+    private void displayCheckOut()
+    {
+        System.out.println();
+        System.out.println("Checking Out");
+        System.out.println("--------------------------------------------------------------------------------------------");
+        System.out.println("ID          Product Name                         Price");
+
+        for (int p : cartItems.keySet())
+        {
+            Product product = productMap.get(p);
+            int quantity = cartItems.get(p);
+            // calculate total prices
+            float sum = product.getProductPrice() * quantity;
+
+            displayProduct(product);
+            System.out.println("\t\t\t Quantity: " + quantity);
+            System.out.println("--------------------------------------------------------------------------------------------");
+            System.out.println("ToTal:                                          $ " + sum);
+        }
+
+        cartItems.clear();
     }
 
 
@@ -179,6 +253,4 @@ public class OnlineStoreApp
     {
         System.out.printf("%-10d %-37s $ %.2f\n", products.getProductId(), products.getProductName(), products.getProductPrice());
     }
-
-
 }
