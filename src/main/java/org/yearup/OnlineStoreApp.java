@@ -165,45 +165,69 @@ public class OnlineStoreApp
     // display products for shopping and add products to shopping cart
     private void displayAllProducts()
     {
-        System.out.println();
-        System.out.println("Shopping Center");
-        System.out.println("--------------------------------------------------------------------------------------------");
-        System.out.println("ID          Product Name                         Price");
-
-        for (Product p : products)
+        try
         {
-            displayProduct(p);
+            System.out.println();
+            System.out.println("Shopping Center");
+            System.out.println("--------------------------------------------------------------------------------------------");
+            System.out.println("ID          Product Name                         Price");
+
+            for (Product product : products)
+            {
+                displayProduct(product);
+            }
+
+            System.out.println();
+            System.out.println("What you want to do?");
+            System.out.println("\t 1. Add item");
+            System.out.println("\t 2. Back to home screen");
+            System.out.print("Enter your selection: ");
+            int selection = scanner.nextInt();
+            scanner.nextLine();
+
+            if (selection == 1)
+            {
+                System.out.print("Enter item ID to add it: ");
+                int id = scanner.nextInt();
+                scanner.nextLine();
+
+                if (productMap.containsKey(id))
+                {
+                    if (cartItems.containsKey(id))
+                    {
+                        int quantity = cartItems.get(id) + 1;
+                        cartItems.put(id, quantity);
+                    }
+                    else
+                    {
+                        cartItems.put(id, 1);
+                    }
+
+                    System.out.println();
+                    System.out.println("Added Item successfully");
+
+                }
+                else
+                {
+                    System.out.println();
+                    System.out.println("Invalid ID");
+                    displayAllProducts();
+                }
+            }
+            else if (selection == 2)
+            {
+                displayHomeScreen();
+            }
+            else
+            {
+                System.out.println();
+                System.out.println("Invalid selection");
+            }
         }
-
-       System.out.println();
-       System.out.print("Enter product's ID to add item to Shopping Cart or Enter 0 to go back Home Screen: ");
-       int id = scanner.nextInt();
-       scanner.nextLine();
-
-       if (id == 0)
-       {
-           displayHomeScreen();
-       }
-       else
-       {
-           if (productMap.containsKey(id))
-           {
-               if (cartItems.containsKey(id))
-               {
-                   int quantity = cartItems.get(id) + 1;
-                   cartItems.put(id, quantity);
-               }
-               else
-               {
-                   cartItems.put(id, 1);
-               }
-           }
-           else
-           {
-               System.out.println();
-               System.out.println("Invalid selection.");
-           }
-       }
+        catch (Exception e)
+        {
+            System.out.println(e.getMessage());
+        }
     }
 
 
@@ -218,19 +242,47 @@ public class OnlineStoreApp
             System.out.println("ID          Product Name                         Price");
             cartList();
             System.out.println();
-            System.out.print("Enter 0 for Check Out products or Enter product's ID to remove product: ");
-            int id = scanner.nextInt();
+            System.out.println("What you want to do?");
+            System.out.println("\t 1. Check out");
+            System.out.println("\t 2. Remove item");
+            System.out.println("\t 3. Clear the shopping cart");
+            System.out.println("\t 4. Back to shopping");
+            System.out.print("Enter your selection: ");
+            int selection = scanner.nextInt();
             scanner.nextLine();
 
-            if (id == 0)
+            if (selection == 1)
             {
                 displayCheckOut();
             }
-            else if (cartItems.containsKey(id))
+            else if (selection == 2)
             {
-                cartItems.remove(id);
+                System.out.print("Enter item ID to remove it: ");
+                int id = scanner.nextInt();
+                scanner.nextLine();
+
+                if (cartItems.containsKey(id))
+                {
+                    cartItems.remove(id);
+                    System.out.println();
+                    System.out.println("Removed product successfully");
+                }
+                else
+                {
+                    System.out.println();
+                    System.out.println("Invalid Id");
+                    displayCart();
+                }
+            }
+            else if (selection == 3)
+            {
+                cartItems.clear();
                 System.out.println();
-                System.out.println("\nRemoved product successfully\n");
+                System.out.println("Cleared shopping cart successfully");
+            }
+            else if (selection == 4)
+            {
+                displayAllProducts();
             }
             else
             {
@@ -282,6 +334,8 @@ public class OnlineStoreApp
                 System.out.printf("This is your change: $ %.2f \n", change);
                 System.out.println();
                 System.out.println("Completed payment!");
+                System.out.println();
+                System.out.println("Receipt");
                 System.out.println("---------------------------------------------------------------");
                 System.out.println("ID          Product Name                         Price");
                 cartList();
@@ -300,6 +354,8 @@ public class OnlineStoreApp
             {
                 System.out.println();
                 System.out.println("Completed payment!");
+                System.out.println();
+                System.out.println("Receipt");
                 System.out.println("---------------------------------------------------------------");
                 System.out.println("ID          Product Name                         Price");
                 cartList();
@@ -330,10 +386,10 @@ public class OnlineStoreApp
     // display cart's items list
     private void cartList()
     {
-        for (int pd : cartItems.keySet())
+        for (int key : cartItems.keySet())
         {
-            Product product = productMap.get(pd);
-            int quantity = cartItems.get(pd);
+            Product product = productMap.get(key);
+            int quantity = cartItems.get(key);
             displayProduct(product);
 
             System.out.println("\t\t\t Quantity: " + quantity);
@@ -345,10 +401,10 @@ public class OnlineStoreApp
     private float calculation()
     {
         float count = 0;
-        for (int p : cartItems.keySet())
+        for (int key : cartItems.keySet())
         {
-            int quantity = cartItems.get(p);
-            Product product = productMap.get(p);
+            int quantity = cartItems.get(key);
+            Product product = productMap.get(key);
             count = count + (product.getProductPrice() * quantity);
         }
         return count;
