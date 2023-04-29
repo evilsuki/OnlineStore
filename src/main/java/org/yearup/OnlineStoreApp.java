@@ -13,24 +13,42 @@ public class OnlineStoreApp
     Scanner scanner = new Scanner(System.in);
     ArrayList<Product> products = loadInventory();
     HashMap<Integer, Product> productMap = productIdMap();
-
     HashMap<Integer, Integer> cartItems = new HashMap<>();
+
 
     public void run()
     {
-        while (true)
+        try
         {
-            int selection = displayHomeScreen();
-
-            switch (selection)
+            while (true)
             {
-                case 1 -> displayAllProducts();
-                case 2 -> displayCart();
-                case 3 ->
+                int selection = displayHomeScreen();
+
+                if (selection == 1)
                 {
-                    return;
+                    displayAllProducts();
+                }
+                else if (selection == 2)
+                {
+                    displayCart();
+                }
+                else if (selection == 3)
+                {
+                    System.out.println();
+                    System.out.println("Good bye, see you again!");
+                    break;
+                }
+                else
+                {
+                    System.out.println();
+                    System.out.println("Invalid selection");
                 }
             }
+        }
+        catch (Exception e)
+        {
+            System.out.println();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -182,6 +200,7 @@ public class OnlineStoreApp
            }
            else
            {
+               System.out.println();
                System.out.println("Invalid selection.");
            }
        }
@@ -191,61 +210,148 @@ public class OnlineStoreApp
     // display shopping cart for check out
     private void displayCart()
     {
-        System.out.println();
-        System.out.println("Your Shopping Cart");
-        System.out.println("--------------------------------------------------------------------------------------------");
-        System.out.println("ID          Product Name                         Price");
-
-        for (int productId : cartItems.keySet())
+        try
         {
-            Product product = productMap.get(productId);
-            int quantity = cartItems.get(productId);
+            System.out.println();
+            System.out.println("Your Shopping Cart");
+            System.out.println("--------------------------------------------------------------------------------------------");
+            System.out.println("ID          Product Name                         Price");
+            cartList();
+            System.out.println();
+            System.out.print("Enter 0 for Check Out products or Enter product's ID to remove product: ");
+            int id = scanner.nextInt();
+            scanner.nextLine();
 
-            displayProduct(product);
-            System.out.println("\t\t\t Quantity: " + quantity);
+            if (id == 0)
+            {
+                displayCheckOut();
+            }
+            else if (cartItems.containsKey(id))
+            {
+                cartItems.remove(id);
+                System.out.println();
+                System.out.println("\nRemoved product successfully\n");
+            }
+            else
+            {
+                System.out.println();
+                System.out.println("Invalid selection.");
+                displayHomeScreen();
+            }
         }
-
-        System.out.print("Enter 0 for Check Out products or Enter product's ID to remove product: ");
-        int id = scanner.nextInt();
-        scanner.nextLine();
-
-        if (id == 0)
+        catch (Exception e)
         {
-            displayCheckOut();
-        }
-        else if (cartItems.containsKey(id))
-        {
-            cartItems.remove(id);
-        }
-        else
-        {
-            System.out.println("Invalid selection.");
+            System.out.println();
+            System.out.println(e.getMessage());
         }
     }
 
 
-    // calculator for check out
+    // display check out screen
     private void displayCheckOut()
     {
-        System.out.println();
-        System.out.println("Checking Out");
-        System.out.println("--------------------------------------------------------------------------------------------");
-        System.out.println("ID          Product Name                         Price");
+        try
+        {
+            // print out list of products in cart
+            System.out.println();
+            System.out.println("Checking Out");
+            System.out.println("--------------------------------------------------------------------------------------------");
+            System.out.println("ID          Product Name                         Price");
+            cartList();
+            System.out.println("--------------------------------------------------------------------------------------------");
+            System.out.printf("ToTal:                                          $ %.2f \n", calculation());
 
+            // customer payment
+            System.out.println();
+            System.out.print("Enter the amount of money: ");
+            float money = scanner.nextFloat();
+            scanner.nextLine();
+
+            if (money < calculation())
+            {
+                System.out.println("Return: $ " + money);
+                System.out.println("PLease enter enough amount of money to pay");
+                displayCheckOut();
+
+            }
+            else if (money > calculation())
+            {
+                float change = money - calculation();
+
+                System.out.println();
+                System.out.printf("This is your change: $ %.2f \n", change);
+                System.out.println();
+                System.out.println("Completed payment!");
+                System.out.println("---------------------------------------------------------------");
+                System.out.println("ID          Product Name                         Price");
+                cartList();
+                System.out.println("---------------------------------------------------------------");
+                System.out.printf("ToTal:                                          $ %.2f \n", calculation());
+                System.out.printf("Payment:                                        $ %.2f \n", money);
+                System.out.printf("Change:                                         $ %.2f \n", change);
+                System.out.println("Balance:                                        $ 0.00");
+                System.out.println("---------------------------------------------------------------");
+                System.out.println("                       THANK YOU");
+
+                cartItems.clear();
+
+            }
+            else if (money == calculation())
+            {
+                System.out.println();
+                System.out.println("Completed payment!");
+                System.out.println("---------------------------------------------------------------");
+                System.out.println("ID          Product Name                         Price");
+                cartList();
+                System.out.println("---------------------------------------------------------------");
+                System.out.println("ToTal:                                          $ " + calculation());
+                System.out.println("Payment:                                        $ " + money);
+                System.out.println("Balance:                                        $ 0.00");
+                System.out.println("---------------------------------------------------------------");
+                System.out.println("                    THANK YOU");
+
+                cartItems.clear();
+
+            }
+            else
+            {
+                System.out.println("Invalid money input!");
+                displayCheckOut();
+            }
+        }
+        catch (Exception e)
+        {
+            System.out.println();
+            System.out.println(e.getMessage());
+        }
+    }
+
+
+    // display cart's items list
+    private void cartList()
+    {
+        for (int pd : cartItems.keySet())
+        {
+            Product product = productMap.get(pd);
+            int quantity = cartItems.get(pd);
+            displayProduct(product);
+
+            System.out.println("\t\t\t Quantity: " + quantity);
+        }
+    }
+
+
+    // calculate total price for check out
+    private float calculation()
+    {
+        float count = 0;
         for (int p : cartItems.keySet())
         {
-            Product product = productMap.get(p);
             int quantity = cartItems.get(p);
-            // calculate total prices
-            float sum = product.getProductPrice() * quantity;
-
-            displayProduct(product);
-            System.out.println("\t\t\t Quantity: " + quantity);
-            System.out.println("--------------------------------------------------------------------------------------------");
-            System.out.println("ToTal:                                          $ " + sum);
+            Product product = productMap.get(p);
+            count = count + (product.getProductPrice() * quantity);
         }
-
-        cartItems.clear();
+        return count;
     }
 
 
