@@ -12,8 +12,8 @@ public class OnlineStoreApp
 {
     Scanner scanner = new Scanner(System.in);
     ArrayList<Product> products = loadInventory();
-    HashMap<Integer, Product> productMap = productIdMap();
-    HashMap<Integer, Integer> cartItems = new HashMap<>();
+    HashMap<String, Product> productMap = productIdMap();
+    HashMap<String, Integer> cartItems = new HashMap<>();
 
 
     public void run()
@@ -68,7 +68,7 @@ public class OnlineStoreApp
             while ((line = reader.readLine()) != null)
             {
                 String[] columm = line.split("\\|");
-                int productId = Integer.parseInt(columm[0]);
+                String productId = columm[0];
                 String productName = columm[1];
                 float productPrice = Float.parseFloat(columm[2]);
 
@@ -101,11 +101,11 @@ public class OnlineStoreApp
     }
 
 
-    private HashMap<Integer, Product> productIdMap()
+    private HashMap<String, Product> productIdMap()
     {
         FileReader fileReader;
         BufferedReader reader = null;
-        HashMap<Integer, Product> product = new HashMap<>();
+        HashMap<String, Product> product = new HashMap<>();
 
         try
         {
@@ -116,7 +116,7 @@ public class OnlineStoreApp
             while ((line = reader.readLine()) != null)
             {
                 String[] columm = line.split("\\|");
-                int productId = Integer.parseInt(columm[0]);
+                String productId = columm[0];
                 String productName = columm[1];
                 float productPrice = Float.parseFloat(columm[2]);
 
@@ -188,8 +188,7 @@ public class OnlineStoreApp
             if (selection == 1)
             {
                 System.out.print("Enter item ID to add it: ");
-                int id = scanner.nextInt();
-                scanner.nextLine();
+                String id = scanner.nextLine().toUpperCase().strip();
 
                 if (productMap.containsKey(id))
                 {
@@ -258,8 +257,7 @@ public class OnlineStoreApp
             else if (selection == 2)
             {
                 System.out.print("Enter item ID to remove it: ");
-                int id = scanner.nextInt();
-                scanner.nextLine();
+                String id = scanner.nextLine().toUpperCase().strip();
 
                 if (cartItems.containsKey(id))
                 {
@@ -386,7 +384,7 @@ public class OnlineStoreApp
     // display cart's items list
     private void cartList()
     {
-        for (int key : cartItems.keySet())
+        for (String key : cartItems.keySet())
         {
             Product product = productMap.get(key);
             int quantity = cartItems.get(key);
@@ -401,7 +399,7 @@ public class OnlineStoreApp
     private float calculation()
     {
         float count = 0;
-        for (int key : cartItems.keySet())
+        for (String key : cartItems.keySet())
         {
             int quantity = cartItems.get(key);
             Product product = productMap.get(key);
@@ -413,6 +411,6 @@ public class OnlineStoreApp
 
     private void displayProduct(Product products)
     {
-        System.out.printf("%-10d %-37s $ %.2f\n", products.getProductId(), products.getProductName(), products.getProductPrice());
+        System.out.printf("%-10s %-37s $ %.2f\n", products.getProductId(), products.getProductName(), products.getProductPrice());
     }
 }

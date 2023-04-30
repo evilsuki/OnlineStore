@@ -8,12 +8,12 @@ public class Product implements Comparable<Product>
         return this.productName.compareTo(p.productName);
     }
 
-    private int productId;
+    private String productId;
     private String productName;
     private float productPrice;
 
 
-    public Product(int productId, String productName, float productPrice)
+    public Product(String productId, String productName, float productPrice)
     {
         this.productId = productId;
         this.productName = productName;
@@ -21,12 +21,12 @@ public class Product implements Comparable<Product>
     }
 
 
-    public int getProductId()
+    public String getProductId()
     {
         return productId;
     }
 
-    public void setProductId(int productId)
+    public void setProductId(String productId)
     {
         this.productId = productId;
     }
